@@ -189,8 +189,8 @@ def check_backward(func, x_data, y_grad, params=(),
             :func:`assert_allclose`.
         no_grads (list of bool): Flag to skip variable for gradient assertion.
             It should be same length as ``x_data``.
-        dtype (~numpy.dtype): `x_data` and `y_grad` are casted to this dtype
-            when calculating numerical gradients.
+        dtype (~numpy.dtype): `x_data` is casted to this dtype when calculating
+            numerical gradients.
 
     See:
        :func:`numerical_grad`
@@ -230,15 +230,16 @@ def check_backward(func, x_data, y_grad, params=(),
     y[0].backward()
 
     if dtype is None:
-        cxs = [variable.Variable(x) for x in x_data]
+        input_xs = [variable.Variable(x) for x in x_data]
     else:
         if len(params) > 0:
             raise ValueError('`dtype` is available only if `params` is empty')
-        cxs = [variable.Variable(x.astype(dtype) if x.dtype.kind == 'f' else x)
-               for x in x_data]
+        input_xs = [variable.Variable(x.astype(dtype)
+                    if x.dtype.kind == 'f' else x)
+                    for x in x_data]
 
     def f():
-        ys = func(*cxs)
+        ys = func(*input_xs)
         ys = _as_tuple(ys)
         return tuple(y.data for y in ys)
 
@@ -248,11 +249,11 @@ def check_backward(func, x_data, y_grad, params=(),
         if len(no_grads) != len(xs):
             raise ValueError(
                 'Length of no_grads param and xs should be same.')
-    for skip, x, cx in six.moves.zip(no_grads, xs, cxs):
+    for skip, x, ix in six.moves.zip(no_grads, xs, input_xs):
         if skip:
             assert x.grad is None
             continue
-        gx, = numerical_grad(f, (cx.data,), y_grad, eps=eps)
+        gx, = numerical_grad(f, (ix.data,), y_grad, eps=eps)
         assert_allclose(gx, x.grad, atol=atol, rtol=rtol)
         if dtype is None:
             assert gx.dtype == x.grad.dtype
