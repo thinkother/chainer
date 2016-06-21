@@ -50,6 +50,7 @@ class Optimizer(object):
             method.
 
     """
+
     def setup(self, link):
         """Sets a target link and initializes the optimizer states.
 
@@ -355,6 +356,7 @@ class GradientMethod(Optimizer):
       :meth:`update_one_gpu`
 
     """
+
     def update(self, lossfun=None, *args, **kwds):
         """Updates parameters based on a loss function or computed gradients.
 
