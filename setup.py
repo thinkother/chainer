@@ -28,7 +28,7 @@ cupy_setup_build.parse_args()
 
 setup(
     name='cupy',
-    version='1.9.1',
+    version='1.0.0',
     description=('An implementation of NumPy-compatible multi-dimensional '
                  'array on CUDA'),
     author='Seiya Tokui',
